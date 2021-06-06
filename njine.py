@@ -65,7 +65,8 @@ c1=[]
 c2=[]
 c3=[]
 c4=[]
-def secure():
+def secure(request):
+    #this is a test for the CUSTOM property
     return True
 def awpage(type,path,file,tlist="public", optfunc="ooo"):
     gserver.append(file)
@@ -178,7 +179,6 @@ def run():
                 fin = open(filename.replace("/", ""))
                 content = fin.read()
                 fin.close()
-                content=Njinetemplate(content,{'weather':'10','H':0})
                 print(request)
                 if d == "public":
                     if cookiecheck("P"):
@@ -196,7 +196,7 @@ def run():
                     else:
                         response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your cookie is not present or your cookie does not have security permitions"
                 else:
-                    if c1[loc]:
+                    if c1[loc](request):
                         response = 'HTTP/1.0 200 OK\n\n' + content
                     else:
                         response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your auth is not present or your auth does not have security permitions"

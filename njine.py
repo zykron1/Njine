@@ -320,5 +320,5 @@ def run():
 
     # Close socket
     server_socket.close()
-awpage("custom","/","index.html",secure(""))
+awpage("custom","/","index.html","public",secure)
 run()

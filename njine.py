@@ -3,6 +3,7 @@ import os
 import datetime
 import random
 import string
+from urllib.parse import urlparse
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -100,6 +101,8 @@ def adf(type,resource,tlist="public", optfunc="ooo"):
     t.append(type)
     td4.append(tlist)
 def run():
+    def hints(path):
+        return urlparse("/"+path)
     print(f"{bcolors.INFO}{bcolors.BOLD}[INFO]{bcolors.ENDC} Server is starting")
     Delete=True
     SERVER_HOST = '0.0.0.0'
@@ -154,13 +157,13 @@ def run():
         # Get the client request
         request = client_connection.recv(1024).decode()
         # Parse HTTP headers
-        print(f"{bcolors.INFO}Server request is coming {request}")
+        print(f"{bcolors.INFO}{bcolors.BOLD}[INFO]{bcolors.ENDC} Request is coming:\n{bcolors.FAIL}{request}{bcolors.ENDC}")
         headers = request.split('\n')
         try:
             method = headers[0].split()[0]
         except:
             print(headers)
-        print(f"{bcolors.INFO}Request method is {method}{bcolors.ENDC}")
+        print(f"{bcolors.INFO}Request method was {method}{bcolors.ENDC}")
         if method == "GET":
             try:
                 filename = headers[0].split()[1]
@@ -202,10 +205,10 @@ def run():
                         response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your auth is not present or your auth does not have security permitions"
             except FileNotFoundError:
                 try:
-                    for i in range(len(m2path)):
-                        if filename.startswith(m2path[i]):
-                            loc=m2func[i]
-                    response = 'HTTP/1.0 200 OK\n\n' + loc(request)
+                    for i in range(len(mpath)):
+                        if filename.startswith(mpath[i]):
+                            loc=mfunc[i]
+                    response = 'HTTP/1.0 200 OK\n\n' + loc(request,hints(filename))
                 except:
                     response = 'HTTP/1.0 404 NOT FOUND\n\nCrash! We cant seem to find the webpage your looking for, Make sure that you typed the url in corectly.'    
             client_connection.sendall(response.encode())
@@ -252,7 +255,7 @@ def run():
                     for i in range(len(m2path)):
                         if filename.startswith(m2path[i]):
                             loc=m2func[i]
-                    response = 'HTTP/1.0 200 OK\n\n' + loc(request)
+                    response = 'HTTP/1.0 200 OK\n\n' + loc(request,hints(filename))
                 except:
                     response = "HTTP/1.0 400 Bad Request \n\n"
             try: 
@@ -331,7 +334,7 @@ def run():
 
     # Close socket
     server_socket.close()
-def about(request):
+def about(request,hints):
     return "ahsan"
 awpage("custom","/","index.html","public",secure)
 swpage("/about",about)

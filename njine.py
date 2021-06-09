@@ -23,7 +23,7 @@ global pst
 global ptserver
 global ptsp
 global ptst
-global mfgec
+global mfunc
 global mpath
 global m2func
 global m2path
@@ -99,8 +99,8 @@ def adf(type,resource,tlist="public", optfunc="ooo"):
     r.append(resource)
     t.append(type)
     td4.append(tlist)
-print(f"{bcolors.INFO}{bcolors.BOLD}[INFO]{bcolors.ENDC} Server is starting")
 def run():
+    print(f"{bcolors.INFO}{bcolors.BOLD}[INFO]{bcolors.ENDC} Server is starting")
     Delete=True
     SERVER_HOST = '0.0.0.0'
     SERVER_PORT = 8000
@@ -174,7 +174,7 @@ def run():
                     filename = gserver[i]
                     d=gst[i]
                     u=td1[i]
-                    loc=i
+                    loc=i 
             try:
                 fin = open(filename.replace("/", ""))
                 content = fin.read()
@@ -201,8 +201,13 @@ def run():
                     else:
                         response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your auth is not present or your auth does not have security permitions"
             except FileNotFoundError:
-                response = 'HTTP/1.0 404 NOT FOUND\n\nCrash! We cant seem to find the webpage your looking for, Make sure that you typed the url in corectly.'
-            
+                try:
+                    for i in range(len(m2path)):
+                        if filename.startswith(m2path[i]):
+                            loc=m2func[i]
+                    response = 'HTTP/1.0 200 OK\n\n' + loc(request)
+                except:
+                    response = 'HTTP/1.0 404 NOT FOUND\n\nCrash! We cant seem to find the webpage your looking for, Make sure that you typed the url in corectly.'    
             client_connection.sendall(response.encode())
             client_connection.close()
         if method == "POST":
@@ -243,7 +248,13 @@ def run():
                     else:
                         response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your cookie is not present or your cookie does not have security permitions"
             except:
-                response = "400 Bad Request"
+                try:
+                    for i in range(len(m2path)):
+                        if filename.startswith(m2path[i]):
+                            loc=m2func[i]
+                    response = 'HTTP/1.0 200 OK\n\n' + loc(request)
+                except:
+                    response = "HTTP/1.0 400 Bad Request \n\n"
             try: 
                 client_connection.sendall(response.encode())
                 client_connection.close()
@@ -320,5 +331,8 @@ def run():
 
     # Close socket
     server_socket.close()
+def about(request):
+    return "ahsan"
 awpage("custom","/","index.html","public",secure)
+swpage("/about",about)
 run()

@@ -41,6 +41,8 @@ global c2
 global c3
 global c4
 global secure
+global path
+global value
 gserver=[]
 gsp=[]
 gst=[]
@@ -66,6 +68,11 @@ c1=[]
 c2=[]
 c3=[]
 c4=[]
+path=[]
+value=[]
+def inject(path2,value2):
+    path.append(path2)
+    value.append(f"\n{value2}")
 def secure(request):
     #this is a test for the CUSTOM property
     return True
@@ -101,6 +108,7 @@ def adf(type,resource,tlist="public", optfunc="ooo"):
     t.append(type)
     td4.append(tlist)
 def run():
+    global path
     def hints(path):
         return urlparse("/"+path)
     print(f"{bcolors.INFO}{bcolors.BOLD}[INFO]{bcolors.ENDC} Server is starting")
@@ -179,6 +187,10 @@ def run():
                     u=td1[i]
                     loc=i 
             try:
+                if gsp[loc] in path:
+                    injection=value[path.index(gsp[loc])]
+                else:
+                    injection=""
                 fin = open(filename.replace("/", ""))
                 content = fin.read()
                 fin.close()
@@ -210,7 +222,11 @@ def run():
                             loc=mfunc[i]
                     response = 'HTTP/1.0 200 OK\n\n' + loc(request,hints(filename))
                 except:
-                    response = 'HTTP/1.0 404 NOT FOUND\n\nCrash! We cant seem to find the webpage your looking for, Make sure that you typed the url in corectly.'    
+                    response = 'HTTP/1.0 404 NOT FOUND\n\nCrash! We cant seem to find the webpage your looking for, Make sure that you typed the url in corectly.'  
+
+            r2=response.split("\n\n")
+            r2.insert(1,injection)
+            response=r2[0]+r2[1]+f"\n\n{r2[2]}" 
             client_connection.sendall(response.encode())
             client_connection.close()
         if method == "POST":
@@ -336,6 +352,7 @@ def run():
     server_socket.close()
 def about(request,hints):
     return "ahsan"
+inject("/","Server:Njine")
 awpage("custom","/","index.html","public",secure)
 swpage("/about",about)
 run()

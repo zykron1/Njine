@@ -273,13 +273,19 @@ def run():
                         key= "Set-cookie:"+"256PIN="+''.join(random.choice(letters) for i in range(256)) 
                         response="HTTP/1.0 200 OK\n"+key+"\n\n"
                         cbp.append(key)
+                elif n=="bearer":
+                    if bearer(u):
+                        response = 'HTTP/1.0 200 Ok\n\n'
+                    else:
+                        response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your auth is not present or your auth does not have security permitions"
+                        
                 elif n=="custom":
                     if c2[loc]:
                         response = 'HTTP/1.0 200 Ok\n\n'
                     else:
                         response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your auth is not present or your auth does not have security permitions"
                 else:
-                    if cookiecheck("E"):
+                    if cookiecheck("E",u):
                         print("Hello " + POSTMSG)
                         response = 'HTTP/1.0 200 Ok\n\n'
                     else:
@@ -375,4 +381,5 @@ di={'knights': 'that say nih'}
 awpage("custom","/",render("index.html",knights="hello",posts="ak"),"public",secure)
 swpage("/about",about)
 awpage("bearer","/bearer","yooo",["Bearer abc"])
+npost("bearer","/postb","bearer",["Bearer abc"])
 run()

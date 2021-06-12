@@ -131,6 +131,16 @@ def run():
         for i in range(len(things)):
             data=data.replace(things[i],str(f2[i]))
         return data
+    def bearer(u):
+        for i in range(len(headers)):
+            #print("Header[1] is " + headers[1].split(":")[1])
+            try:
+                var=(headers[i].split(": ")[i].rstrip())
+                if var in u:
+                    return True
+            except:
+                pass
+        return False
     def cookiecheck(type, E=[]):
         if type == "P":
             for i in range(len(headers)):
@@ -210,6 +220,11 @@ def run():
                         print(response)
                 elif d=="private":
                     if cookiecheck("E", u):
+                        response = 'HTTP/1.0 200 OK\n\n' + content
+                    else:
+                        response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your cookie is not present or your cookie does not have security permitions"
+                elif d=="bearer":
+                    if bearer(u):
                         response = 'HTTP/1.0 200 OK\n\n' + content
                     else:
                         response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your cookie is not present or your cookie does not have security permitions"
@@ -359,4 +374,5 @@ inject("/","Server:Njine")
 di={'knights': 'that say nih'}
 awpage("custom","/",render("index.html",knights="hello",posts="ak"),"public",secure)
 swpage("/about",about)
+awpage("bearer","/bearer","yooo",["Bearer abc"])
 run()

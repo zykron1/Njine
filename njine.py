@@ -4,6 +4,7 @@ import datetime
 import random
 import string
 from urllib.parse import urlparse
+import jinja2
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -107,6 +108,10 @@ def adf(type,resource,tlist="public", optfunc="ooo"):
     r.append(resource)
     t.append(type)
     td4.append(tlist)
+def render(file,**args):
+    jinja=jinja2.Environment(loader=jinja2.FileSystemLoader('templates'))
+    jinja=jinja.get_template(file)
+    return jinja.render(args)
 def run():
     global path
     def hints(path):
@@ -191,9 +196,7 @@ def run():
                     injection=value[path.index(gsp[loc])]
                 else:
                     injection=""
-                fin = open(filename.replace("/", ""))
-                content = fin.read()
-                fin.close()
+                content = gserver[loc]
                 print(request)
                 if d == "public":
                     if cookiecheck("P"):
@@ -353,6 +356,7 @@ def run():
 def about(request,hints):
     return "ahsan"
 inject("/","Server:Njine")
-awpage("custom","/","index.html","public",secure)
+di={'knights': 'that say nih'}
+awpage("custom","/",render("index.html",knights="hello",posts="ak"),"public",secure)
 swpage("/about",about)
 run()

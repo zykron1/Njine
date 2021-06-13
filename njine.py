@@ -1,5 +1,5 @@
 import socket
-import os
+import sys
 import datetime
 import random
 import string
@@ -250,7 +250,11 @@ def run():
         if method == "POST":
             try:
                 filename = headers[0].split()[1]
-                POSTMSG=headers[10]
+                v=request.split("\n\n")
+                del v[0]
+                for i in v:
+                    l=f"{l}{v[i]}"
+                POSTMSG=l
             except:
                 response = 'HTTP/1.0 400 Bad Request \n\n We seem to be having some difficulties, please reload the page'
             """
@@ -266,7 +270,7 @@ def run():
             try:
                 if n=="public":
                     if cookiecheck("p"):
-                        print("Hello " + POSTMSG)
+                        pserver[loc]()
                         response = 'HTTP/1.0 200 Ok\n\n'
                     else:
                         letters = string.ascii_lowercase
@@ -275,18 +279,20 @@ def run():
                         cbp.append(key)
                 elif n=="bearer":
                     if bearer(u):
+                        pserver[loc]()
                         response = 'HTTP/1.0 200 Ok\n\n'
                     else:
                         response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your auth is not present or your auth does not have security permitions"
                         
                 elif n=="custom":
                     if c2[loc]:
+                        pserver[loc]()
                         response = 'HTTP/1.0 200 Ok\n\n'
                     else:
                         response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your auth is not present or your auth does not have security permitions"
                 else:
                     if cookiecheck("E",u):
-                        print("Hello " + POSTMSG)
+                        pserver[loc]()
                         response = 'HTTP/1.0 200 Ok\n\n'
                     else:
                         response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your cookie is not present or your cookie does not have security permitions"
@@ -304,74 +310,68 @@ def run():
             except:
                 client_connection.sendall("HTTP/1.0 400 Bad Request \n\n".encode())
                 client_connection.close()
-        if method == "DELETE":
-            filename = headers[0].split()[1]
-            """
-            HTTP DELETE REGISTRY
-            """
-            if Delete:
-                path=filename.split("/")
-                print(f"{bcolors.WARNING}{filename}{bcolors.ENDC}")
-                if filename=="/ris.html": #add a and to make sure that it is in a list of deletable resorces and that the user is allowed
-                    d=True
-                if filename == "/fcdns.txt":
-                    d=False
-                if not(d):
-                    if cookiecheck("P"):
-                        try:
-                            os.remove(filename)
-                            response = 'HTTP/1.0 200 Ok\n\nHTTP/1.1 200 OK Date: ',now,'<html><head><style>h1{font-family: "Gill Sans", sans-serif;font-weight: bold;</style></head> <body> <h1 id="bowl">File deleted.</h1> </body> </html>'
-                            client_connection.sendall(response.encode())
-                            client_connection.close()
-                        except:
-                            response = 'HTTP/1.0 204 No Content\n\n'
-                            client_connection.sendall(response.encode())
-                            client_connection.close()
+        if method == "PUT":
+            try:
+                filename = headers[0].split()[1]
+                v=request.split("\n\r\n")
+                del v[0]
+                l="\n\n".join(v)
+                POSTMSG=l
+            except:
+                response = 'HTTP/1.0 400 Bad Request \n\n We seem to be having some difficulties, please reload the page'
+            print("Processing PUT")
+            for i in range(len(ptserver)):
+                if filename == ptsp[i]:
+                    filename = ptserver[i]
+                    n=ptst[i]
+                    u=td3[i]
+                    loc=i
+            try:
+                if n=="public":
+                    if cookiecheck("p"):
+                        open(filename,"w").write(POSTMSG)
+                        
+                        response = 'HTTP/1.0 200 Ok\n\n'
                     else:
-                        response = 'HTTP/1.0 204 No Content\n\n'
-                        client_connection.sendall(response.encode())
-                        client_connection.close()
+                        letters = string.ascii_lowercase
+                        key= "Set-cookie:"+"256PIN="+''.join(random.choice(letters) for i in range(256)) 
+                        response="HTTP/1.0 200 OK\n"+key+"\n\n"
+                        cbp.append(key)
+                elif n=="bearer":
+                    if bearer(u):
+                        open(filename,"w").write(POSTMSG)
+                        response = 'HTTP/1.0 200 Ok\n\n'
+                    else:
+                        response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your auth is not present or your auth does not have security permitions"
+                        
+                elif n=="custom":
+                    if c2[loc]:
+                        open(filename,"w").write(POSTMSG)
+                        response = 'HTTP/1.0 200 Ok\n\n'
+                    else:
+                        response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your auth is not present or your auth does not have security permitions"
                 else:
-                    if cookiecheck("E"):
-                        os.remove(filename)
-                        response = 'HTTP/1.0 200 Ok\n\nHTTP/1.1 200 OK Date: ',now,'<html><head><style>h1{font-family: "Gill Sans", sans-serif;font-weight: bold;</style></head> <body> <h1 id="bowl">File deleted.</h1> </body> </html>'
-                        client_connection.sendall(response.encode())
-                        client_connection.close()
+                    if cookiecheck("E",u):
+                        pserver[loc]()
+                        response = 'HTTP/1.0 200 Ok\n\n'
                     else:
-                        response = 'HTTP/1.0 204 No Content\n\n'
-                        client_connection.sendall(response.encode())
-                        client_connection.close()
-            else:
-                response = 'HTTP/1.0 204 No Content\n\n'
+                        response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your cookie is not present or your cookie does not have security permitions"
+            except:
+                e = sys.exc_info()[0]
+                print( "<p>Error: %s</p>" % e )
+                try:
+                    for i in range(len(m3path)):
+                        if filename.startswith(m3path[i]):
+                            loc=m3func[i]
+                    response = 'HTTP/1.0 200 OK\n\n' + loc(request,hints(filename))
+                except:
+                    response = "HTTP/1.0 400 Bad Request \n\n"
+            try: 
                 client_connection.sendall(response.encode())
                 client_connection.close()
-        if method == "PUT":
-            filename = headers[0].split()[1].replace("/")
-            if filename == "index.html":
-                typ="pub"
-                filname="index.html"
-            if typ=="pub":
-                if cookiecheck("P"):
-                    try:
-                        n=headers.split("\n\n")
-                        del n[0]
-                        n='\n\n'.join(n)
-                        with open(filename) as myfile:
-                            data = myfile.read()
-                            myfile.seek(0)
-                            myfile.write(n)
-                            myfile.truncate()
-                        response=("HTTP/1.1 201 Created\n"+"Content-Location: "+filename)
-                    except:
-                        response=("HTTP/1.1 204 No Content\n"+"Content-Location: "+filename)
-                    client_connection.sendall(response.encode())
-                    client_connection.close()
-                else:
-                    letters = string.ascii_lowercase
-                    key= "Set-cookie:"+"256PIN="+''.join(random.choice(letters) for i in range(256)) 
-                    response="HTTP/1.0 200 OK\n"+key+"\n\n"
-                    cbp.append(key)
-
+            except:
+                client_connection.sendall("HTTP/1.0 400 Bad Request \n\n".encode())
+                client_connection.close()
     # Close socket
     server_socket.close()
 def about(request,hints):
@@ -382,4 +382,5 @@ awpage("custom","/",render("index.html",knights="hello",posts="ak"),"public",sec
 swpage("/about",about)
 awpage("bearer","/bearer","yooo",["Bearer abc"])
 npost("bearer","/postb","bearer",["Bearer abc"])
+nput("bearer","/test","templates/index.html",["Bearer abc"])
 run()

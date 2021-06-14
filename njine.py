@@ -1,5 +1,6 @@
 import socket
 import sys
+import os
 import datetime
 import random
 import string
@@ -44,6 +45,10 @@ global c4
 global secure
 global path
 global value
+global s
+global v
+global vv
+global p
 gserver=[]
 gsp=[]
 gst=[]
@@ -71,6 +76,10 @@ c3=[]
 c4=[]
 path=[]
 value=[]
+s=[]
+v=[]
+vv=[]
+p=[]
 def inject(path2,value2):
     path.append(path2)
     value.append(f"\n{value2}")
@@ -104,10 +113,15 @@ def nput(type,path,file,tlist="public", optfunc="ooo"):
 def sput(path,func):
     m3func.append(func)
     m3path.append(path)
-def adf(type,resource,tlist="public", optfunc="ooo"):
+def andf(type,path,resource,tlist="public", optfunc="ooo"):
     r.append(resource)
+    p.append(path)
     t.append(type)
     td4.append(tlist)
+    s.append(optfunc)
+def asdf(path,func):
+    v.append(path)
+    vv.append(func)
 def render(file,**args):
     jinja=jinja2.Environment(loader=jinja2.FileSystemLoader('templates'))
     jinja=jinja.get_template(file)
@@ -250,10 +264,9 @@ def run():
         if method == "POST":
             try:
                 filename = headers[0].split()[1]
-                v=request.split("\n\n")
+                v=request.split("\n\r\n")
                 del v[0]
-                for i in v:
-                    l=f"{l}{v[i]}"
+                l="\n\n".join(v)
                 POSTMSG=l
             except:
                 response = 'HTTP/1.0 400 Bad Request \n\n We seem to be having some difficulties, please reload the page'
@@ -372,6 +385,72 @@ def run():
             except:
                 client_connection.sendall("HTTP/1.0 400 Bad Request \n\n".encode())
                 client_connection.close()
+        if method == "DELETE":
+            try:
+                filename = headers[0].split()[1]
+            except:
+                response="HTTP/1.0 400 Bad Request \n\n"
+            for i in range(len(r)):
+                if filename == p[i]:
+                    filename = r[i]
+                    n=t[i]
+                    u=td4[i]
+                    loc=i
+            try:
+                if n=="public":
+                    if cookiecheck("p"):
+                        try:
+                            os.rmdir(filename)
+                        except:
+                            os.remove(filename)
+                        response = 'HTTP/1.0 200 Ok\n\n'
+                    else:
+                        letters = string.ascii_lowercase
+                        key= "Set-cookie:"+"256PIN="+''.join(random.choice(letters) for i in range(256)) 
+                        response="HTTP/1.0 200 OK\n"+key+"\n\n"
+                        cbp.append(key)
+                elif n=="bearer":
+                    if bearer(u):
+                        try:
+                            os.rmdir(filename)
+                        except:
+                            os.remove(filename)
+                        response = 'HTTP/1.0 200 Ok\n\n'
+                    else:
+                        response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your auth is not present or your auth does not have security permitions"
+                        
+                elif n=="custom":
+                    if s[loc]:
+                        try:
+                            os.rmdir(filename)
+                        except:
+                            os.remove(filename)
+                        response = 'HTTP/1.0 200 Ok\n\n'
+                    else:
+                        response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your auth is not present or your auth does not have security permitions"
+                else:
+                    if cookiecheck("E",u):
+                        try:
+                            os.rmdir(filename)
+                        except:
+                            os.remove(filename)
+                        response = 'HTTP/1.0 200 Ok\n\n'
+                    else:
+                        response = 'HTTP/1.0 403 Forbidden\n\n'+"Unautherized, either your cookie is not present or your cookie does not have security permitions"
+            except:
+                try:
+                    for i in range(len(v)):
+                        if filename.startswith(v[i]):
+                            loc=vv[i]
+                    response = 'HTTP/1.0 200 OK\n\n' + loc(request,hints(filename))
+                except:
+                    response = "HTTP/1.0 400 Bad Request \n\n"
+            try: 
+                client_connection.sendall(response.encode())
+                client_connection.close()
+            except:
+                client_connection.sendall("HTTP/1.0 400 Bad Request \n\n".encode())
+                client_connection.close()
     # Close socket
     server_socket.close()
 def about(request,hints):
@@ -383,4 +462,5 @@ swpage("/about",about)
 awpage("bearer","/bearer","yooo",["Bearer abc"])
 npost("bearer","/postb","bearer",["Bearer abc"])
 nput("bearer","/test","templates/index.html",["Bearer abc"])
+andf("custom","/btest","never","public",secure)
 run()

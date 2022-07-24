@@ -10,7 +10,7 @@ def render(file,**args):
         jinja=jinja2.Environment(loader=jinja2.FileSystemLoader('templates'))
         jinja=jinja.get_template(file)
         return jinja.render(args)
-class njine:
+class Njine:
     class bcolors:
         HEADER = '\033[95m'
         OKBLUE = '\033[94m'
@@ -47,7 +47,7 @@ class njine:
     global c2
     global c3
     global c4
-    global secure
+    global ecure
     global path
     global value
     global s
@@ -504,6 +504,8 @@ class njine:
         server_socket.close()
     def about(request,hints):
         return "ahsan"
-app=njine()
-app.route(method="GET",type="auto",auth="bearer",path="/",data="dd",custom=["Bearer abc"])
+
+#Test Program Here
+app = Njine()
+app.route(method="GET",type="auto",auth="public",path="/",data="dd")
 app.run()
